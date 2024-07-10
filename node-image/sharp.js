@@ -2,107 +2,108 @@ const sharp = require('sharp');
 const fs = require('fs');
 const ort = require('onnxruntime-node');
 let info = {
-  className: '小鹿',
-  point: [1959, 694, 2652, 1557], //x1 y1 x2 y2
-  score: 0.98,
+  className: '21',
+  point: [864, 659, 587, 872], //x1 y1 width height
+  score: 0.8872634768486023,
 };
+let data = [
+  {
+    confidence: 0.7,
+    index: 2,
+  },
+  {
+    confidence: 0.8,
+    index: 2,
+  },
+  {
+    confidence: 0.1,
+    index: 2,
+  },
+  {
+    confidence: 0.3,
+    index: 3,
+  },
+  {
+    confidence: 0.4,
+    index: 3,
+  },
+];
 
-async function rectangle(img, item) {
-  // const session = await ort.InferenceSession.create('./squeezenet1_1.onnx');
-  // const { data, info } = await sharp(img)
-  //   .resize(224, 224) // 调整图像大小以匹配模型输入大小
-  //   .raw()
-  //   .toBuffer({ resolveWithObject: true });
-  // const { width, height, channels } = info;
-  // const uint8Array = new Uint8Array(data);
-  // console.log(width, height, channels);
-  // const float32Array = new Float32Array(uint8Array.length);
-  // for (let i = 0; i < uint8Array.length; i++) {
-  //   float32Array[i] = uint8Array[i];
-  // }
-  // const tensor = new ort.Tensor('float32', float32Array, [
-  //   1,
-  //   channels,
-  //   height,
-  //   width,
-  // ]);
-  // console.log(tensor);
-  // let outPut = await session.run({ data: tensor });
-  // console.log(outPut.cpuData);
+async function rectangle(img, item, line = 5) {
   let data1 = await sharp(img)
+    .jpeg({ quality: 100 }) //高质量输出图片
     .composite([
       {
         //左边竖线
         input: {
           create: {
-            width: 10,
-            height: item.point[3] - item.point[1],
+            width: item.point[2], // 改用红色方框 用线框请用参数line
+            height: item.point[3],
             channels: 4,
-            background: { r: 255, g: 0, b: 0, alpha: 1 },
+            background: { r: 255, g: 0, b: 0, alpha: 0.2 },
           },
         },
-        left: item.point[0],
-        top: item.point[1],
+        left: item.point[0] - Math.floor(item.point[2] / 2),
+        top: item.point[1] - Math.floor(item.point[3] / 2),
       },
-      {
-        //右边竖线
-        input: {
-          create: {
-            width: 10,
-            height: item.point[3] - item.point[1],
-            channels: 4,
-            background: { r: 255, g: 0, b: 0, alpha: 1 },
-          },
-        },
-        left: item.point[2],
-        top: item.point[1],
-      },
-      {
-        //下边横线
-        input: {
-          create: {
-            width: item.point[2] - item.point[0],
-            height: 10,
-            channels: 4,
-            background: { r: 255, g: 0, b: 0, alpha: 1 },
-          },
-        },
-        left: item.point[0],
-        top: item.point[3],
-      },
-      {
-        //上边横线
-        input: {
-          create: {
-            width: item.point[2] - item.point[0],
-            height: 10,
-            channels: 4,
-            background: { r: 255, g: 0, b: 0, alpha: 1 },
-          },
-        },
+      // {
+      //   //右边竖线
+      //   input: {
+      //     create: {
+      //       width: line,
+      //       height: item.point[3],
+      //       channels: 4,
+      //       background: { r: 255, g: 0, b: 0, alpha: 1 },
+      //     },
+      //   },
+      //   left: item.point[0] + Math.floor(item.point[2] / 2),
+      //   top: item.point[1] - Math.floor(item.point[3] / 2),
+      // },
+      // {
+      //   //下边横线
+      //   input: {
+      //     create: {
+      //       width: item.point[2],
+      //       height: line,
+      //       channels: 4,
+      //       background: { r: 255, g: 0, b: 0, alpha: 1 },
+      //     },
+      //   },
+      //   left: item.point[0] - Math.floor(item.point[2] / 2),
+      //   top: item.point[1] + Math.floor(item.point[3] / 2),
+      // },
+      // {
+      //   //上边横线
+      //   input: {
+      //     create: {
+      //       width: item.point[2],
+      //       height: line,
+      //       channels: 4,
+      //       background: { r: 255, g: 0, b: 0, alpha: 1 },
+      //     },
+      //   },
 
-        left: item.point[0],
-        top: item.point[1],
-      },
+      //   left: item.point[0] - Math.floor(item.point[2] / 2),
+      //   top: item.point[1] - Math.floor(item.point[3] / 2),
+      // },
       {
         //文字
         input: {
           text: {
             width: 1000,
-            height: 60,
+            height: 25,
             rgba: true,
             align: 'left',
-            text: `<span foreground="red">${
-              item.className + ' ' + item.score * 100 + '%'
+            text: `<span foreground="white">${
+              item.className + ' ' + (item.score * 100).toFixed(2) + '%'
             }</span>`,
           },
         },
-        left: item.point[0],
-        top: item.point[1] - 70,
+        left: item.point[0] - Math.floor(item.point[2] / 2),
+        top: item.point[1] - Math.floor(item.point[3] / 2) - 30,
       },
     ])
-
-    .toFile('./combined.jpg');
+    .toFile('./combined2.jpg');
   return data1;
 }
-rectangle('./test.jpg', info);
+rectangle('./test2.jpg', info);
