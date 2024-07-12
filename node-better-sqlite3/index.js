@@ -11,7 +11,7 @@ const insert = DB.prepare(
 const find = DB.prepare('SELECT task FROM users WHERE id = ?');
 
 const insertMany = DB.transaction((user) => {
-  insert.run(user);
+  return insert.run(user);
 });
 let task = [
   {
@@ -21,7 +21,7 @@ let task = [
 ];
 console.log(
   insertMany({
-    id: '12',
+    id: '12333',
     name: '管理员000',
     task: JSON.stringify(task),
   })
