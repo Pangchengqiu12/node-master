@@ -2,6 +2,7 @@
 // Licensed under the MIT license.
 
 const coordtransform = require('coordtransform');
+// const wgs84ToGcj02 = require('./utils');
 const fs = require('fs');
 
 // use an async context to call onnxruntime functions.
@@ -12,7 +13,7 @@ async function main() {
     feature.geometry.coordinates.forEach((coordinate) => {
       coordinate.forEach((coord) => {
         coord.forEach((c) => {
-          const newCoords = coordtransform.wgs84togcj02(c[0], c[1]);
+          const newCoords = wgs84ToGcj02(c[0], c[1]);
           c[0] = newCoords[0];
           c[1] = newCoords[1];
         });
