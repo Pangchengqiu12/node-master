@@ -89,7 +89,7 @@ function main() {
   //   point: 'test',
   // });
 }
-main();
+// main();
 //
 const findTask = DB.prepare(
   'SELECT users.id, tasks.* FROM users JOIN tasks ON users.id = tasks.user_id WHERE users.id = ?'
@@ -112,3 +112,11 @@ function convertToCamelCase(input) {
 }
 // let res = findTask.all('123');
 // console.log(convertToCamelCase(res));
+// 获取表的字段信息
+function getTableColumns(tableName) {
+  const stmt = DB.prepare(`PRAGMA table_info(${tableName})`);
+  const columns = stmt.all().map((column) => column.name);
+  return columns;
+}
+const columns = getTableColumns('tasks');
+console.log(columns);
