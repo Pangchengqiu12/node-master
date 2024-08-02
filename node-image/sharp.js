@@ -1,6 +1,11 @@
 const sharp = require('sharp');
 const fs = require('fs');
 const ort = require('onnxruntime-node');
+const sessionOptions = {
+  executionProviders: ['cuda'],
+  enableAllOnnxValueTypes: true,
+};
+const session = new ort.InferenceSession('./yolov8s.onnx', sessionOptions);
 let info = {
   className: '21',
   point: [864, 659, 587, 872], //x1 y1 width height
